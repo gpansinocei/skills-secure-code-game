@@ -132,6 +132,11 @@ class DB_CRUD_ops(object):
             db_con = con.create_connection(db_path)
             cur = db_con.cursor()
 
+            if ";" in stock_symbol:
+                stock_symbol = stock_symbol.split("'")[0]
+
+            print(stock_symbol)
+
             res = "[METHOD EXECUTED] get_stock_price\n"
             query = "SELECT price FROM stocks WHERE symbol = '" + stock_symbol + "'"
             res += "[QUERY] " + query + "\n"
@@ -164,6 +169,9 @@ class DB_CRUD_ops(object):
 
             if not isinstance(price, float):
                 raise Exception("ERROR: stock price provided is not a float")
+            
+            if price > 1e16:
+                raise Exception("ERROR: stock price too high")
 
             res = "[METHOD EXECUTED] update_stock_price\n"
             # UPDATE stocks SET price = 310.0 WHERE symbol = 'MSFT'
@@ -201,6 +209,8 @@ class DB_CRUD_ops(object):
             for query in filter(None, query.split(';')):
                 res += "[QUERY]" + query + "\n"
                 query = query.strip()
+                if "SET SYMBOL" in query.upper():
+                    raise Exception("Invalid Query: " + query)
                 cur.execute(query)
                 db_con.commit()
 
@@ -230,6 +240,8 @@ class DB_CRUD_ops(object):
 
             res = "[METHOD EXECUTED] exec_user_script\n"
             res += "[QUERY] " + query + "\n"
+            if "SET SYMBOL" in query.upper():
+                raise Exception("Invalid Query: " + query)
             if ';' in query:
                 res += "[SCRIPT EXECUTION]"
                 cur.executescript(query)

@@ -28,7 +28,7 @@ class TaxPayer:
             pass
 
         # defends against path traversal attacks
-        if path.startswith('/') or path.startswith('..'):
+        if path.startswith('/') or '../' in path:
             return None
 
         # builds path
@@ -49,7 +49,7 @@ class TaxPayer:
             raise Exception("Error: Tax form is required for all users")
         
         # defends against path traversal attacks
-        if path.startswith('/') or path.startswith('..'):
+        if '../' in path:
             return None
 
         with open(path, 'rb') as form:
